@@ -93,13 +93,15 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
             itemsCount = datasource?.numberOfItems(self) ?? 0
         }
         super.layoutSubviews()
-        if shouldReloadData {
-            panGestureRecognizer.isEnabled = isScrollEnabled && itemsCount > 1
-        }
         let size = self.bounds.size
-        itemSize = CGSize(width: size.width - (marginForItem.left + marginForItem.right), height: size.height - (marginForItem.top + marginForItem.bottom))
-        populateVisibleItems()
-        delegate?.listView(self, didChangeDisplayItemAt: current?.itemIndex ?? 0, with: scrollOffset)
+        let newItemSize = CGSize(width: size.width - (marginForItem.left + marginForItem.right), height: size.height - (marginForItem.top + marginForItem.bottom))
+        if shouldReloadData || (newItemSize != itemSize) {
+            panGestureRecognizer.isEnabled = isScrollEnabled && itemsCount > 1
+            itemSize = newItemSize
+            populateVisibleItems()
+            delegate?.listView(self, didChangeDisplayItemAt: current?.itemIndex ?? 0, with: scrollOffset)
+        }
+        
         shouldReloadData = false
     }
     
@@ -152,7 +154,7 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    private func scrollItems(_ direction: CGFloat) {
+    private func scrollItems(_ direction: CGFloat, cell: ListViewCell? = nil) {
         let leftOrigin, currentOrigin, rightOrigin: CGPoint
         if scrollDirection == .horizontal {
             leftOrigin = CGPoint(x: -bounds.width + marginForItem.left + direction, y: marginForItem.top)
@@ -169,14 +171,17 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
                         self.left?.frame.origin = leftOrigin
                         self.current?.frame.origin = currentOrigin
                         self.right?.frame.origin = rightOrigin
+        }, completion: { _ in
+            cell?.isHidden = false
         })
     }
     
     private func completeChartMovement(to direction: CGFloat) {
-        func move(_ move: ListViewSwipeDirection) {
+        func move(_ move: ListViewSwipeDirection) -> ListViewCell {
+            var cell: ListViewCell!
             switch move {
             case .right, .bottom:
-                let cell = itemCells.removeLast()
+                cell = itemCells.removeLast()
                 cell.prepareForReuse()
                 let index = (left?.itemIndex ?? 0) - 1
                 cell.isHidden = true
@@ -185,9 +190,8 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
                 cell.itemIndex = index >= 0 ? index : (itemsCount - 1)
                 scrollOffset -= 1
                 delegate?.listView(self, willDisplay: cell, at: cell.itemIndex, with: scrollOffset - 1)
-                cell.isHidden = false
             case .left, .top:
-                let cell = itemCells.removeFirst()
+                cell = itemCells.removeFirst()
                 cell.prepareForReuse()
                 let index = (right?.itemIndex ?? 0) + 1
                 cell.isHidden = true
@@ -196,25 +200,26 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
                 cell.itemIndex = index < itemsCount ? index : 0
                 scrollOffset += 1
                 delegate?.listView(self, willDisplay: cell, at: cell.itemIndex, with: scrollOffset + 1)
-                cell.isHidden = false
             }
             currentDisplay = current?.itemIndex ?? 0
+            return cell
         }
         
         let time = touchEnded - touchBegan
+        var cell: ListViewCell?
         switch (direction, time) {
         case (let x, _) where x > scrollFactor:
-            move(scrollDirection == .horizontal ? .right : .bottom)
+            cell = move(scrollDirection == .horizontal ? .right : .bottom)
         case (let x, _) where x < 0 && abs(x) > scrollFactor:
-            move(scrollDirection == .horizontal ? .left : .top)
+            cell = move(scrollDirection == .horizontal ? .left : .top)
         case (let x, let t) where x > 0 && t < 0.2:
-            move(scrollDirection == .horizontal ? .right : .bottom)
+            cell = move(scrollDirection == .horizontal ? .right : .bottom)
         case (let x, let t) where x < 0  && t < 0.2:
-            move(scrollDirection == .horizontal ? .left : .top)
+            cell = move(scrollDirection == .horizontal ? .left : .top)
         default:
             break
         }
-        scrollItems(0)
+        scrollItems(0, cell: cell)
         delegate?.listView(self, didChangeDisplayItemAt: current?.itemIndex ?? 0, with: scrollOffset)
     }
     

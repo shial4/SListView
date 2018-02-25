@@ -95,11 +95,11 @@ open class ListView: UIView, UIGestureRecognizerDelegate {
         super.layoutSubviews()
         if shouldReloadData {
             panGestureRecognizer.isEnabled = isScrollEnabled && itemsCount > 1
-            let size = self.bounds.size
-            itemSize = CGSize(width: size.width - (marginForItem.left + marginForItem.right), height: size.height - (marginForItem.top + marginForItem.bottom))
-            populateVisibleItems()
-            delegate?.listView(self, didChangeDisplayItemAt: current?.itemIndex ?? 0, with: scrollOffset)
         }
+        let size = self.bounds.size
+        itemSize = CGSize(width: size.width - (marginForItem.left + marginForItem.right), height: size.height - (marginForItem.top + marginForItem.bottom))
+        populateVisibleItems()
+        delegate?.listView(self, didChangeDisplayItemAt: current?.itemIndex ?? 0, with: scrollOffset)
         shouldReloadData = false
     }
     

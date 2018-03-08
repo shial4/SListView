@@ -7,8 +7,8 @@
         <a href="https://raw.githubusercontent.com/shial4/SLazeKit/master/LICENSE">
             <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
         </a>
-        <a href="https://cocoapods.org/pods/SListView">
-            <img src="https://img.shields.io/cocoapods/v/SListView.svg" alt="CocoaPods" />
+        <a href="https://cocoapods.org/pods/SLSListView">
+            <img src="https://img.shields.io/cocoapods/v/SLSListView.svg" alt="CocoaPods" />
         </a>
         <a href="https://github.com/Carthage/Carthage">
             <img src="https://img.shields.io/badge/carthage-compatible-4BC51D.svg?style=flat" alt="Carthage" />

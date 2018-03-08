@@ -18,8 +18,8 @@
 Swift list view collection.
 
 <p align="center">
-<img src="Content/SListViewV.png">
-<img src="Content/SListViewH.png">
+<img src="Content/SListViewV.gif">
+<img src="Content/SListViewH.gif">
 </p>
 
 ## 🔧 Installation

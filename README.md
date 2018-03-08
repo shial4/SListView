@@ -26,7 +26,7 @@ Swift list view collection.
 
 **CocoaPods:**
 
-Add the line `pod "SListView"` to your `Podfile`
+Add the line `pod "SLSListView"` to your `Podfile`
 
 **Carthage:**
 
